@@ -1,3 +1,5 @@
+var/datum/rnd_manager/rndSystem = new()
+
 /datum/rnd_manager
 	var/max_active_projects = 3
 	var/level = 1
@@ -19,20 +21,20 @@
 		possible_projects -= selection
 
 	proc/check_scans (atom/scanned)
-		for (var/datum/rnd_project P in active_projects)
+		for (var/datum/rnd_project/P in active_projects)
 			var/missing_tasks = FALSE
-			for(var/datum/rnd_task task in P.tasks)
+			for(var/datum/rnd_task/task in P.tasks)
 				if (task.completed) continue
 				if (task.validate_task(scanned))
 					task.completed = TRUE
 				else
 					missing_tasks = TRUE
 			if (!missing_tasks)
-			complete_project(P)
+				complete_project(P)
 
 
 
-	proc/complete_project(var/rnd_project R)
+	proc/complete_project(var/datum/rnd_project/R)
 		R.researched = TRUE
 		active_projects -= R
 		completed_projects += R
@@ -49,19 +51,20 @@ ABSTRACT_TYPE(/datum/rnd_project)
 	var/list/blueprints = list()// fabricator recipes unlocked by researching the tech
 
 	New()
+		..()
 		create_tasks(1)
 
 
 	proc/create_tasks(var/task_count = 1)
 		for(var/i in 1 to task_count)
-			selction = pick(valid_tasks)
+			var/selection = pick(valid_tasks)
 			if(ispath(selection))
-				datum/research_task/R = new selection()
+				var/datum/rnd_task/R = new selection()
 				tasks += R
 				valid_tasks -= selection
 
 	proc/generate_file() //creates a manudrive blueprint file with all associated blueprints
-		var/MD = new /datum/computer/file/manudrive
+		var/datum/computer/file/manudrive/MD = new()
 		for (var/X in src.blueprints)
 			MD.drivestored += get_schematic_from_path(X)
 		return MD

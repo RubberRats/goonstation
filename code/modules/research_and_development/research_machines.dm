@@ -1,5 +1,6 @@
 /obj/machinery/computer/rnd
 	name = "research and development console"
+	icon_state = "wizard" //placeholder for now
 	var/obj/item/disk/data/floppy/loaded_disk = null
 
 	attackby(obj/item/W, mob/user)
@@ -13,6 +14,13 @@
 				boutput(user, "<span class='alert'>There's already a disk inside!</span>")
 
 		. = ..()
+
+	ui_interact(mob/user, datum/tgui/ui)
+		. = ..()
+		ui = tgui_process.try_update_ui(user, src, ui)
+		if(!ui)
+			ui = new(user, src, "RnDConsole")
+			ui.open()
 
 	ui_data(mob/user)
 		. = list(

@@ -74,9 +74,7 @@ TYPEINFO(/obj/machinery/mixer)
 			boutput(user, SPAN_ALERT("You can't put that in the mixer!"))
 			return
 		user.visible_message(SPAN_NOTICE("[user] puts [W] into the [src]."))
-		user.u_equip(W)
-		W.set_loc(src)
-		W.dropped(user)
+		src.load_item(W, user)
 		tgui_process.update_uis(src)
 		src.UpdateIcon()
 
@@ -114,12 +112,23 @@ TYPEINFO(/obj/machinery/mixer)
 				. = ""
 			base64_preview_cache[original_name] = .
 
-	proc/ejectItemFromMixer(obj/item/target)
-		if (target)
+	proc/load_item(obj/item/ingredient, mob/user)
+		if(!locate(ingredient.type) in src.contents)
+			src.possible_recipes += src.get_recipes_from_ingredient(ingredient)
+			sortList(src.possible_recipes, /proc/cmp_recipe_priority)
+		user?.u_equip(ingredient)
+		ingredient.set_loc(src)
+		if(user)
+			ingredient.dropped(user)
+
+	proc/eject_item(obj/item/ingredient)
+		if (ingredient)
 			if (BOUNDS_DIST(usr, src) == 0)
-				usr.put_in_hand_or_drop(target)
+				usr.put_in_hand_or_drop(ingredient)
 			else
-				target.set_loc(src.loc)
+				ingredient.set_loc(src.loc)
+			if(!locate(ingredient.type) in src.contents)
+				src.possible_recipes -= src.get_recipes_from_ingredient(ingredient)
 
 	ui_act(action, params)
 		. = ..()
@@ -130,7 +139,7 @@ TYPEINFO(/obj/machinery/mixer)
 			if ("eject")
 				var/index = params["index"]
 				var/obj/item/target = src.contents[index]
-				src.ejectItemFromMixer(target)
+				src.eject_item(target)
 
 				usr.show_text(SPAN_NOTICE("You eject the [target.name] from the [src]."))
 				. = TRUE
@@ -141,7 +150,7 @@ TYPEINFO(/obj/machinery/mixer)
 
 			if ("ejectAll")
 				for (var/obj/item/target in src.contents)
-					src.ejectItemFromMixer(target)
+					src.eject_item(target)
 
 				usr.show_text(SPAN_NOTICE("You eject all contents from the [src]."))
 				. = TRUE
@@ -195,9 +204,28 @@ TYPEINFO(/obj/machinery/mixer)
 		if (TIME < src.timeMixEnd)
 			return
 
+		var/obj/item/F = src.finish_cook()
+		if(F)
+			F.set_loc(src.loc)
+
+		for (var/obj/I in src.contents)
+			I.set_loc(src.loc)
+			src.visible_message(SPAN_ALERT("[I] is tossed out of [src]!"))
+			var/edge = get_edge_target_turf(src, pick(alldirs))
+			I.throw_at(edge, 25, 4)
+
+		src.working = 0
+		src.UpdateIcon()
+		playsound(src.loc, 'sound/machines/ding.ogg', 50, 1)
+		tgui_process.update_uis(src)
+		src.power_usage = 0
+		UnsubscribeProcess()
+		return
+
+	proc/finish_cook()
 		var/output = null // /obj/item/reagent_containers/food/snacks/yuck
 		var/derivename = 0
-		var/datum/recipe/R = src.get_valid_recipe()
+		var/datum/cookingrecipe/R = src.get_valid_recipe()
 		output = R.specialOutput(src)
 		if(!output)
 			output = getVariant(R)
@@ -227,20 +255,7 @@ TYPEINFO(/obj/machinery/mixer)
 			qdel(I)
 		to_remove.len = 0
 
-		for (var/obj/I in src.contents)
-			I.set_loc(src.loc)
-			src.visible_message(SPAN_ALERT("[I] is tossed out of [src]!"))
-			var/edge = get_edge_target_turf(src, pick(alldirs))
-			I.throw_at(edge, 25, 4)
 
-		src.working = 0
-		src.UpdateIcon()
-		playsound(src.loc, 'sound/machines/ding.ogg', 50, 1)
-		tgui_process.update_uis(src)
-
-		src.power_usage = 0
-		UnsubscribeProcess()
-		return
 
 	proc/get_valid_recipe()
 		for (var/datum/cookingrecipe/R in src.possible_recipes)
@@ -254,6 +269,17 @@ TYPEINFO(/obj/machinery/mixer)
 			if (!bowl_checkitem(I, recipe.ingredients[I])) return FALSE
 
 		return TRUE
+
+	proc/get_recipes_from_ingredient(obj/item/ingredient) //TODO: unify the recipes_by_ingredient lists so you don't have to redefine everything
+		var/datum/recipe_manager/RM = get_singleton(/datum/recipe_manager)
+		var/considered_type = ingredient.type
+		while(considered_type != /obj/item && considered_type != /obj/item/reagent_containers/food/snacks/ingredient)
+			if(RM.mixer_recipes_by_ingredient[considered_type])
+				var/output = RM.mixer_recipes_by_ingredient[considered_type]
+				return output
+			else
+				considered_type = type2parent(considered_type)
+		return list()
 
 	proc/getVariant(datum/cookingrecipe/recipe)
 		for(var/specialIngredient in recipe.variants)

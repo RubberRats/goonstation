@@ -494,10 +494,25 @@ TYPEINFO(/obj/submachine/chef_oven)
 				src.possible_recipes = null
 			if ("eject")
 				var/obj/item/thing_to_eject = src.contents[params["ejected_item"]]
-				if (thing_to_eject)
-					thing_to_eject.set_loc(src.loc)
-					if(!locate(thing_to_eject.type) in src.contents)
-						src.possible_recipes -= src.get_recipes_from_ingredient(thing_to_eject)
+				src.eject_item(thing_to_eject)
+
+	proc/load_item(obj/item/ingredient, mob/user)
+		if(!locate(ingredient.type) in src.contents)
+			src.possible_recipes += src.get_recipes_from_ingredient(ingredient)
+			sortList(src.possible_recipes, /proc/cmp_recipe_priority)
+		user?.u_equip(ingredient)
+		ingredient.set_loc(src)
+		if(user)
+			ingredient.dropped(user)
+
+	proc/eject_item(obj/item/ingredient)
+		if (ingredient)
+			if (BOUNDS_DIST(usr, src) == 0)
+				usr.put_in_hand_or_drop(ingredient)
+			else
+				ingredient.set_loc(src.loc)
+			if(!locate(ingredient.type) in src.contents)
+				src.possible_recipes -= src.get_recipes_from_ingredient(ingredient)
 
 	proc/get_content_icons()
 		if (!length(src.contents))
@@ -767,12 +782,7 @@ TYPEINFO(/obj/submachine/chef_oven)
 			boutput(user, SPAN_ALERT("You can't put that in [src]!"))
 			return
 		user.visible_message(SPAN_NOTICE("[user] loads [W] into [src]."))
-		if(!locate(W.type) in src.contents)
-			src.possible_recipes += src.get_recipes_from_ingredient(W)
-			sortList(src.possible_recipes, /proc/cmp_recipe_priority)
-		user.u_equip(W)
-		W.set_loc(src)
-		W.dropped(user)
+		src.load_item(W, user)
 		tgui_process.update_uis(src)
 
 	MouseDrop_T(obj/item/W as obj, mob/user as mob)

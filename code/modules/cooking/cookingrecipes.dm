@@ -87,7 +87,8 @@ ABSTRACT_TYPE(/datum/cookingrecipe/oven/burger)
 	/obj/item/reagent_containers/food/snacks/ingredient/meat/humanmeat = /obj/item/reagent_containers/food/snacks/burger/humanburger,
 	/obj/item/reagent_containers/food/snacks/ingredient/meat/monkeymeat = /obj/item/reagent_containers/food/snacks/burger/monkeyburger,
 	/obj/item/reagent_containers/food/snacks/ingredient/meat/synthmeat = /obj/item/reagent_containers/food/snacks/burger/synthburger,
-	/obj/item/reagent_containers/food/snacks/ingredient/meat/mysterymeat = /obj/item/reagent_containers/food/snacks/burger/mysteryburger)
+	/obj/item/reagent_containers/food/snacks/ingredient/meat/mysterymeat = /obj/item/reagent_containers/food/snacks/burger/mysteryburger,
+	/obj/item/reagent_containers/food/snacks/ingredient/meat/bacon = /obj/item/reagent_containers/food/snacks/burger/baconburger)
 
 
 /datum/cookingrecipe/oven/burger/cheeseburger
@@ -99,6 +100,7 @@ ABSTRACT_TYPE(/datum/cookingrecipe/oven/burger)
 	output = /obj/item/reagent_containers/food/snacks/burger/cheeseburger
 
 /datum/cookingrecipe/oven/burger/cheeseburger/monkey
+	priority = PRIORITY_HIGHER
 	ingredients = list(\
 	/obj/item/reagent_containers/food/snacks/ingredient/dough = 1,
 	/obj/item/reagent_containers/food/snacks/ingredient/meat/monkeymeat = 1,
@@ -183,13 +185,8 @@ ABSTRACT_TYPE(/datum/cookingrecipe/oven/burger)
 	cookbonus = 15
 	output = /obj/item/reagent_containers/food/snacks/burger/cheeseborger
 
-/datum/cookingrecipe/oven/burger/baconburger
-	ingredients = list(\
-	/obj/item/reagent_containers/food/snacks/ingredient/dough = 1,
-	/obj/item/reagent_containers/food/snacks/ingredient/meat/bacon = 1)
-	output = /obj/item/reagent_containers/food/snacks/burger/baconburger
-
 /datum/cookingrecipe/oven/burger/baconator
+	priority = PRIORITY_HIGHER
 	ingredients = list(\
 	/obj/item/reagent_containers/food/snacks/ingredient/dough = 1,
 	/obj/item/reagent_containers/food/snacks/ingredient/meat = 2,
@@ -205,6 +202,7 @@ ABSTRACT_TYPE(/datum/cookingrecipe/oven/burger)
 	output = /obj/item/reagent_containers/food/snacks/burger/butterburger
 
 /datum/cookingrecipe/oven/burger/aburgination
+	priority = PRIORITY_HIGHER
 	ingredients = list(\
 	/obj/item/reagent_containers/food/snacks/ingredient/dough = 1,
 	/obj/item/reagent_containers/food/snacks/ingredient/meat/mysterymeat/changeling = 1)
@@ -603,6 +601,7 @@ ABSTRACT_TYPE(/datum/cookingrecipe/oven/sandwich)
 	output = /obj/item/reagent_containers/food/snacks/sandwich/banhmi
 
 /datum/cookingrecipe/oven/sandwich/custom
+	priority = PRIORITY_HIGHER
 	ingredients =  list(/obj/item/reagent_containers/food/snacks/breadslice = 2)
 	cookbonus = 12
 	output = /obj/item/reagent_containers/food/snacks/sandwich
@@ -1497,6 +1496,7 @@ ABSTRACT_TYPE(/datum/cookingrecipe/oven/sandwich)
 	category = "Cakes"
 
 /datum/cookingrecipe/oven/cake_bacon
+	priority = PRIORITY_HIGHER
 	ingredients = list(\
 	/obj/item/reagent_containers/food/snacks/cake_batter = 1,
 	/obj/item/reagent_containers/food/snacks/ingredient/meat/bacon = 3)

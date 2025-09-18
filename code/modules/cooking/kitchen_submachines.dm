@@ -402,9 +402,6 @@ TYPEINFO(/obj/submachine/ice_cream_dispenser)
 
 /// COOKING RECODE ///
 
-var/list/oven_recipes = list()
-
-
 TYPEINFO(/obj/submachine/chef_oven)
 	mats = 18
 

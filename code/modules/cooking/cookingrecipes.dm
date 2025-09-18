@@ -1,3 +1,5 @@
+#define PRIORITY_NORMAL 0
+#define PRIORITY_HIGHER 0.1
 ABSTRACT_TYPE(/datum/cookingrecipe)
 /datum/cookingrecipe
 	var/list/ingredients
@@ -7,6 +9,7 @@ ABSTRACT_TYPE(/datum/cookingrecipe)
 	var/category = "Unsorted" /// category for sorting, use null to hide
 	var/list/variants = null
 	var/variant_quantity = 1
+	var/priority = PRIORITY_NORMAL
 
 	proc/specialOutput(var/obj/submachine/ourCooker)
 		return null //If returning an object, that is used as the output
@@ -212,6 +215,9 @@ ABSTRACT_TYPE(/datum/cookingrecipe/oven/burger)
 	ingredients = list(/obj/item/reagent_containers/food/snacks/burger/bigburger = 4)
 	cookbonus = 20
 	output = /obj/item/reagent_containers/food/snacks/burger/monsterburger
+	specialOutput(obj/submachine/ourCooker)
+		return null
+
 
 /datum/cookingrecipe/oven/swede_mball
 	ingredients = list(\
@@ -2142,3 +2148,5 @@ ABSTRACT_TYPE(/datum/cookingrecipe/oven/sandwich)
 	ingredients = list(/obj/item/reagent_containers/food/snacks/ingredient/raw_flan = 1)
 	cookbonus = 6
 	output = /obj/item/reagent_containers/food/snacks/flan
+#undef PRIORITY_NORMAL
+#undef PRIORITY_HIGHER

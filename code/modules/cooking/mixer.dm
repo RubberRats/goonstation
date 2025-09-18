@@ -24,6 +24,7 @@ TYPEINFO(/obj/machinery/mixer)
 	var/image/blender_off
 	var/image/blender_powered
 	var/image/blender_working
+	var/list/datum/cookingrecipe/possible_recipes
 	var/list/recipes = null
 	var/list/to_remove = list()
 	var/allowed = list(/obj/item/reagent_containers/food/, /obj/item/parts/robot_parts/head, /obj/item/clothing/head/butt, /obj/item/organ/brain)
@@ -196,23 +197,12 @@ TYPEINFO(/obj/machinery/mixer)
 
 		var/output = null // /obj/item/reagent_containers/food/snacks/yuck
 		var/derivename = 0
-		check_recipe:
-			for (var/datum/cookingrecipe/R in src.recipes)
-				to_remove.len = 0
-				for(var/I in R.ingredients)
-					if (!bowl_checkitem(I, R.ingredients[I])) continue check_recipe
-				output = R.specialOutput(src)
-				if (!output)
-					if(R.variants)//replace all of this with getVariant() once cooking machines are given a common type
-						for(var/specialIngredient in R.variants)
-							if(output) break
-							if(bowl_checkitem(specialIngredient, R.variant_quantity))
-								output = R.variants[specialIngredient]
-					else
-						output = R.output
-				if (R.useshumanmeat)
-					derivename = 1
-				break
+		var/datum/recipe/R = src.get_valid_recipe()
+		output = R.specialOutput(src)
+		if(!output)
+			output = getVariant(R)
+		if (R.useshumanmeat)
+			derivename = 1
 
 		if (!isnull(output))
 			var/obj/item/reagent_containers/food/snacks/F
@@ -251,6 +241,25 @@ TYPEINFO(/obj/machinery/mixer)
 		src.power_usage = 0
 		UnsubscribeProcess()
 		return
+
+	proc/get_valid_recipe()
+		for (var/datum/cookingrecipe/R in src.possible_recipes)
+			if (src.can_cook_recipe(R))
+				return R
+		return null
+
+	proc/can_cook_recipe(datum/cookingrecipe/recipe)
+		to_remove.len = 0
+		for(var/I in recipe.ingredients)
+			if (!bowl_checkitem(I, recipe.ingredients[I])) return FALSE
+
+		return TRUE
+
+	proc/getVariant(datum/cookingrecipe/recipe)
+		for(var/specialIngredient in recipe.variants)
+			if(bowl_checkitem(specialIngredient, recipe.variant_quantity))
+				return recipe.variants[specialIngredient]
+		return recipe.output
 
 	power_change()
 		. = ..()

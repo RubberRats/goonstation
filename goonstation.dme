@@ -1160,6 +1160,7 @@
 #include "code\modules\cooking\microwave.dm"
 #include "code\modules\cooking\microwave_recipes.dm"
 #include "code\modules\cooking\mixer.dm"
+#include "code\modules\cooking\recipe_manager.dm"
 #include "code\modules\cooking\shitty_grill.dm"
 #include "code\modules\cooking\soup.dm"
 #include "code\modules\cooking\food_and_drink\alcohol.dm"

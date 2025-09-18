@@ -5,8 +5,6 @@
 /// Mixing time in seconds
 #define MIX_TIME 2 SECONDS
 
-var/list/mixer_recipes = list()
-
 TYPEINFO(/obj/machinery/mixer)
 	mats = 15
 
@@ -33,27 +31,6 @@ TYPEINFO(/obj/machinery/mixer)
 
 	New()
 		..()
-		src.recipes = mixer_recipes
-		if (!src.recipes)
-			src.recipes = list()
-
-		if (!src.recipes.len)
-			src.recipes += new /datum/cookingrecipe/mixer/mix_cake_custom(src)
-			src.recipes += new /datum/cookingrecipe/mixer/pancake_batter(src)
-			src.recipes += new /datum/cookingrecipe/mixer/brownie_batter(src)
-			src.recipes += new /datum/cookingrecipe/mixer/cake_batter(src)
-			src.recipes += new /datum/cookingrecipe/mixer/raw_flan(src)
-			src.recipes += new /datum/cookingrecipe/mixer/custard(src)
-			src.recipes += new /datum/cookingrecipe/mixer/mashedpotatoes(src)
-			src.recipes += new /datum/cookingrecipe/mixer/mashedbrains(src)
-			src.recipes += new /datum/cookingrecipe/mixer/gruel(src)
-			src.recipes += new /datum/cookingrecipe/mixer/fishpaste(src)
-			src.recipes += new /datum/cookingrecipe/mixer/meatpaste(src)
-			src.recipes += new /datum/cookingrecipe/mixer/wonton_wrapper(src)
-			src.recipes += new /datum/cookingrecipe/mixer/butters(src)
-			src.recipes += new /datum/cookingrecipe/mixer/soysauce(src)
-			src.recipes += new /datum/cookingrecipe/mixer/gravy(src)
-
 		src.blender_off = image(src.icon, "blender_off")
 		src.blender_powered = image(src.icon, "blender_powered")
 		src.blender_working = image(src.icon, "blender_working")

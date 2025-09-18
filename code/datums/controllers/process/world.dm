@@ -132,7 +132,8 @@ input:checked + div { display: block; }
 "}
 
 	var/list/recipies = list()
-	for (var/datum/cookingrecipe/R in oven_recipes)
+	var/datum/recipe_manager/RM = get_singleton(/datum/recipe_manager)
+	for (var/datum/cookingrecipe/R in RM.oven_recipes)
 		// do not show recipies set to a null category
 		if (!R.category)
 			continue

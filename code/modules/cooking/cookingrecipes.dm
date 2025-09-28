@@ -1593,7 +1593,7 @@ ABSTRACT_TYPE(/datum/cookingrecipe/oven/sandwich)
 
 /datum/cookingrecipe/mixer/mix_cake_custom
 	ingredients = list(/obj/item/reagent_containers/food/snacks/cake_batter = 1)
-	output = null
+	output = /obj/item/reagent_containers/food/snacks/cake_batter
 
 	specialOutput(var/obj/submachine/ourCooker)
 		if (!ourCooker)

@@ -200,24 +200,15 @@ TYPEINFO(/obj/machinery/mixer)
 		return
 
 	proc/finish_cook()
-		var/output = null // /obj/item/reagent_containers/food/snacks/yuck
-		var/derivename = 0
+		var/obj/item/output = null // /obj/item/reagent_containers/food/snacks/yuck
 		var/datum/cookingrecipe/R = src.get_valid_recipe()
-		output = R.specialOutput(src)
-		if(!output)
-			output = getVariant(R)
-		if (R.useshumanmeat)
-			derivename = 1
-
-		if (!isnull(output))
-			var/obj/item/reagent_containers/food/snacks/F
-			if (ispath(output))
-				F = new output(get_turf(src))
-			else
-				F = output
-				F.set_loc(get_turf(src))
-
-			if (derivename)
+		if(R)
+			output = R.specialOutput(src)
+			if(!output)
+				var/O = src.getVariant(R)
+				output = new O
+			if (R.useshumanmeat)
+				var/obj/item/reagent_containers/food/snacks/F = output
 				var/foodname = F.name
 				for (var/obj/item/reagent_containers/food/snacks/ingredient/meat/humanmeat/M in src.contents)
 					F.name = "[M.subjectname] [foodname]"
@@ -231,8 +222,7 @@ TYPEINFO(/obj/machinery/mixer)
 		for (var/obj/item/I in to_remove)
 			qdel(I)
 		to_remove.len = 0
-
-
+		return output
 
 	proc/get_valid_recipe()
 		for (var/datum/cookingrecipe/R in src.possible_recipes)

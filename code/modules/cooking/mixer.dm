@@ -106,6 +106,7 @@ TYPEINFO(/obj/machinery/mixer)
 				ingredient.set_loc(src.loc)
 			if(!locate(ingredient.type) in src.contents)
 				src.possible_recipes -= src.get_recipes_from_ingredient(ingredient)
+			src.UpdateIcon()
 
 	ui_act(action, params)
 		. = ..()
